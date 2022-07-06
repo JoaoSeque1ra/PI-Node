@@ -90,7 +90,7 @@ module.exports = {
 
         await Contem.create({
             quantidade: 2,
-            valor: 150,
+            valor: descricao.preco,
             descricao_servico_id: descricao.id,
             orcamento_id: orcamento.id
         })
