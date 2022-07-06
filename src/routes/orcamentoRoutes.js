@@ -1,13 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-// const beggingTables = require('../helper/beggingTables');
 const orcamentoController = require('../controller/orcamentoController');
-
-// router.use((req,res,next) => {
-//     beggingTables.createTables()
-//     next();
-// })
 
 router.get('/listOrcamento', orcamentoController.listOrcamentos);
 
