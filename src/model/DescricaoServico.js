@@ -25,4 +25,8 @@ Servico.hasMany(DescricaoServico, {
     foreignKey: 'servico_id'
 });
 
+DescricaoServico.belongsTo(Servico, {
+    foreignKey: 'servico_id'
+});
+
 module.exports = DescricaoServico;

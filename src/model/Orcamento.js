@@ -35,4 +35,9 @@ EstadoPedido.hasMany(Orcamento, {
     foreignKey: 'estado_pedido_id'
 });
 
+Orcamento.belongsTo(EstadoPedido, {
+    foreignKey: 'estado_pedido_id'
+});
+
+
 module.exports = Orcamento;

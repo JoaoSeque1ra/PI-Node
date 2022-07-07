@@ -18,7 +18,10 @@ module.exports = {
     async listOrcamentos(req,res) {
         await Orcamento.findAll({})
         .then((data) => {
-            res.json({success:true, message:"Lista de orçamentos enviada", data:data});
+            if(data != "")
+                return res.json({success:true, message:"Lista de orçamentos enviada", data:data});
+            
+            res.json({success:false, message:"Não existe Orçamentos disponíveis"});
         })
         .catch(err => {
             console.log("Erro no listOrçamento " + err);
@@ -57,12 +60,12 @@ module.exports = {
         const clientId = await Cliente.findOne({
             where: { nome: clientNome }
         })
-        console.log(clientId)
+        console.log(clientId.dataValues)
     
         const estadoId = await EstadoPedido.findOne({
             where: { estado: estado }
         })
-        console.log(estadoId)
+        console.log(estadoId.dataValues)
 
         const orcamento = await Orcamento.create({
             estado_pedido_id: estadoId.id,
@@ -82,7 +85,7 @@ module.exports = {
         const descricao = await DescricaoServico.findOne({
             where: { descricao: nomeDescricaoProduto }
         })
-        console.log(descricao)
+        console.log(descricao.dataValues)
 
         await Contem.create({
             quantidade: 2,
