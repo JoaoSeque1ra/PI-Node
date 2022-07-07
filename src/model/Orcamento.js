@@ -26,6 +26,10 @@ Cliente.hasMany(Orcamento, {
     foreignKey: 'cliente_id'
 });
 
+Orcamento.belongsTo(Cliente, {
+    foreignKey: 'cliente_id'
+}) //Testar!!
+
 //Um estado tem vários orçamentos
 EstadoPedido.hasMany(Orcamento, {
     foreignKey: 'estado_pedido_id'

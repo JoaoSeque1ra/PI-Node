@@ -32,11 +32,7 @@ module.exports = {
 
         await Orcamento.findOne({
             where: { id: id },
-            include: [{
-                Cliente
-            },{
-                EstadoPedido
-            }]  
+            include: Cliente 
         })
         .then((data) => {
             if(data != null)
@@ -131,7 +127,7 @@ module.exports = {
 
     //Criar clientes
     async createClient(req,res) {
-        const { nome, telefone, email, empresa, morada, codigoPostal, localidade, numeroFiscal} = req.body;
+        const { nome, telefone, email, empresa, morada, codigo_postal, localidade, numero_fiscal } = req.body;
 
         const allClients = await Cliente.findAll({})
         console.log(allClients)
@@ -142,9 +138,9 @@ module.exports = {
             email: email,
             empresa: empresa,
             morada: morada,
-            codigoPostal: codigoPostal,
+            codigo_postal: codigo_postal,
             localidade: localidade,
-            numeroFiscal: numeroFiscal
+            numero_fiscal: numero_fiscal
         })
         .then((data) => {
             res.json({success:true, message:"Criado com sucesso um novo cliente", data:data});
@@ -159,7 +155,7 @@ module.exports = {
     async updateClient(req,res) {
         const { id } = req.params;
 
-        const { nome, telefone, email, empresa, morada, codigoPostal, localidade, numeroFiscal} = req.body;
+        const { nome, telefone, email, empresa, morada, codigo_postal, localidade, numero_fiscal } = req.body;
     
         await Cliente.update({
             nome: nome,
@@ -167,9 +163,9 @@ module.exports = {
             email: email,
             empresa: empresa,
             morada: morada,
-            codigoPostal: codigoPostal,
+            codigo_postal: codigo_postal,
             localidade: localidade,
-            numeroFiscal: numeroFiscal
+            numero_fiscal: numero_fiscal
         },{
             where: {id: id},
             returning: true 
