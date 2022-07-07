@@ -12,6 +12,8 @@ sequelize.sync({
     //force:true
 })
 
+const today = new Date();
+
 module.exports = {
     //------------Orçamento------------------
     //Listar Orçamentos
@@ -51,26 +53,26 @@ module.exports = {
 
     //Criar Orçamento
     async createOrcamento(req,res) {
-        const { clientNome ,estado, valor, nomeDescricaoProduto } = req.body;
+        const { clientNome , estado, valor, nomeDescricaoProduto } = req.body;
 
-        let today = new Date();
-        let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        console.log(date);
+        const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        console.log("Dia: " + date);
     
         const clientId = await Cliente.findOne({
             where: { nome: clientNome }
         })
-        console.log(clientId.dataValues)
+        console.log("Dados do Cliente: " + clientId.dataValues)
     
         const estadoId = await EstadoPedido.findOne({
             where: { estado: estado }
         })
-        console.log(estadoId.dataValues)
+        console.log("Estado do pedido: " + estadoId.dataValues)
 
+        console.log("Vou criar o Orçamento");
         const orcamento = await Orcamento.create({
             estado_pedido_id: estadoId.id,
             cliente_id: clientId.id,
-            valor: valor,
+            valor: 0,
             data_orcamento: date
         })
         .then((data) => {
@@ -82,17 +84,35 @@ module.exports = {
             res.json({success:false, message:err.message});
         });
 
-        const descricao = await DescricaoServico.findOne({
-            where: { descricao: nomeDescricaoProduto }
-        })
-        console.log(descricao.dataValues)
+        console.log("Vou separar as descrições dos produtos")
+        const servicos = nomeDescricaoProduto.split(",")
+        console.log(servicos)
 
-        await Contem.create({
-            quantidade: 2,
-            valor: descricao.preco,
-            descricao_servico_id: descricao.id,
-            orcamento_id: orcamento.id
+        console.log("Vou adicionar descrição do produto")
+        Object.keys(servicos).map(async (key) => {
+            console.log(servicos[key])
+
+            const descricao = await DescricaoServico.findOne({
+                where: { descricao: servicos[key] }
+            })
+
+            await Contem.create({
+                orcamento_id: orcamento.id,
+                descricao_servico_id: descricao.id,
+                quantidade: 1,
+                valor: descricao.preco,
+            })
         })
+
+        const valorDescricao = await Contem.findAll()
+        console.log(valorDescricao[0])
+
+        let somar = 0;
+        const valorFinal = Object.keys(valorDescricao).map((key) => {
+            somar = parseInt(valorDescricao[key].dataValues.valor) + somar
+        })
+        console.log(valorFinal)
+
     },
 
     //------------Clientes------------------
