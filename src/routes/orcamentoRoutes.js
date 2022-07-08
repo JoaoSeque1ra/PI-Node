@@ -9,6 +9,8 @@ router.get('/findOrcamento/:id', orcamentoController.getOrcamento);
 
 router.post('/createOrcamento', orcamentoController.createOrcamento);
 
+router.post('/updateOrcamento/:id', orcamentoController.updateOrcamento);
+
 router.get("/listClients", orcamentoController.listClients);
 
 router.get("/listOrcamentoFromClient/:id", orcamentoController.findOrcamentoFromClient);
