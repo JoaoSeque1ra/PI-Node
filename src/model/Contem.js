@@ -25,6 +25,7 @@ DescricaoServico.belongsToMany(Orcamento, {
     through: Contem,
     foreignKey: 'descricao_servico_id'
 });
+
 Orcamento.belongsToMany(DescricaoServico, { 
     through: Contem,
     foreignKey: 'orcamento_id'

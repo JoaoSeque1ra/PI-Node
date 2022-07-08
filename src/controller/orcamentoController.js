@@ -1,3 +1,4 @@
+const { DECIMAL } = require("sequelize");
 const sequelize = require("../config/Database");
 
 const Cliente = require("../model/Cliente");
@@ -16,7 +17,9 @@ module.exports = {
     //------------Orçamento------------------
     //Listar Orçamentos
     async listOrcamentos(req,res) {
-        await Orcamento.findAll({})
+        await Orcamento.findAll({
+            include: DescricaoServico
+        })
         .then((data) => {
             if(data != "")
                 return res.json({success:true, message:"Lista de orçamentos enviada", data:data});
@@ -35,7 +38,7 @@ module.exports = {
 
         await Orcamento.findOne({
             where: { id: id },
-            include: Cliente 
+            include: [Cliente, DescricaoServico]
         })
         .then((data) => {
             if(data != null)
@@ -155,10 +158,11 @@ module.exports = {
         });
     },
 
-    async teste(req,res) {
+    //Não sei se é util!!
+    async findOrcamentoFromClient(req,res) {
         const { id } = req.params
 
-        await Cliente.findOne({
+        await Cliente.findAll({
             where: {id: id},
             include: Orcamento
         })
