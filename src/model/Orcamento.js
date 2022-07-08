@@ -13,6 +13,7 @@ const Orcamento = sequelize.define("orcamento", {
     },
     data_orcamento: {
         type: Sequelize.DATEONLY,
+        defaultValue: new Date(), //preenche por defeito o valor com a data
         allowNull: false,
     }
 },
@@ -28,7 +29,7 @@ Cliente.hasMany(Orcamento, {
 
 Orcamento.belongsTo(Cliente, {
     foreignKey: 'cliente_id'
-}) //Testar!!
+}) 
 
 //Um estado tem vários orçamentos
 EstadoPedido.hasMany(Orcamento, {

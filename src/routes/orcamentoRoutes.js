@@ -11,6 +11,8 @@ router.post('/createOrcamento', orcamentoController.createOrcamento);
 
 router.get("/listClients", orcamentoController.listClients);
 
+router.get("/listClientsOrcamento/:id", orcamentoController.teste);
+
 router.get("/findClient/:id", orcamentoController.getClients);
 
 router.post('/createClient', orcamentoController.createClient);

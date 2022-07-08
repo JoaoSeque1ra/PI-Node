@@ -12,8 +12,6 @@ sequelize.sync({
     //force:true
 })
 
-const today = new Date();
-
 module.exports = {
     //------------Orçamento------------------
     //Listar Orçamentos
@@ -53,16 +51,17 @@ module.exports = {
 
     //Criar Orçamento
     async createOrcamento(req,res) {
-        const { clientNome , estado, valor, nomeDescricaoProduto } = req.body;
-
-        const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        console.log("Dia: " + date);
+        const { clientNome , estado, nomeDescricaoProduto } = req.body;
     
+        //Encontrar Cliente em relação ao nome(vem do frontend)
+        //Pode levar update e mandar apenas o id(do frontend)
         const clientId = await Cliente.findOne({
             where: { nome: clientNome }
         })
         console.log("Dados do Cliente: " + clientId.dataValues)
     
+        //Encontrar Estado em relação ao estado(vem do frontend)
+        //Pode levar update e mandar apenas o id(do frontend)
         const estadoId = await EstadoPedido.findOne({
             where: { estado: estado }
         })
@@ -73,27 +72,28 @@ module.exports = {
             estado_pedido_id: estadoId.id,
             cliente_id: clientId.id,
             valor: 0,
-            data_orcamento: date
         })
-        .then((data) => {
-            res.json({success:true, message:"Criado com sucesso um novo Orçamento", data:data});
-            return data
-        })
-        .catch(err => {
-            console.log("Erro no createOrcamento: " + err);
-            res.json({success:false, message:err.message});
-        });
 
         console.log("Vou separar as descrições dos produtos")
         const servicos = nomeDescricaoProduto.split(",")
         console.log(servicos)
 
         console.log("Vou adicionar descrição do produto")
+
+        let somar = 0;
         Object.keys(servicos).map(async (key) => {
             console.log(servicos[key])
 
             const descricao = await DescricaoServico.findOne({
                 where: { descricao: servicos[key] }
+            })
+            .then((data) => {
+                somar += data.preco
+                console.log(somar)
+                return data
+            })
+            .catch(err => {
+                console.log(err.message)
             })
 
             await Contem.create({
@@ -102,17 +102,24 @@ module.exports = {
                 quantidade: 1,
                 valor: descricao.preco,
             })
+
+            //Na ultima passagem faz
+            if(servicos.length - 1 == key) {
+                orcamento.valor = somar
+
+                await orcamento.save()
+
+                await Orcamento.findOne({where: {id: orcamento.id}})
+                .then((data) => {
+                    res.json({success:true, message:"Criado com sucesso um novo Orçamento", data:data});
+                    return data
+                })
+                .catch(err => {
+                    console.log("Erro no createOrcamento: " + err);
+                    res.json({success:false, message:err.message});
+                })
+            }
         })
-
-        const valorDescricao = await Contem.findAll()
-        console.log(valorDescricao[0])
-
-        let somar = 0;
-        const valorFinal = Object.keys(valorDescricao).map((key) => {
-            somar = parseInt(valorDescricao[key].dataValues.valor) + somar
-        })
-        console.log(valorFinal)
-
     },
 
     //------------Clientes------------------
@@ -146,6 +153,21 @@ module.exports = {
             console.log("Erro no getClient: " + err);
             res.json({success:false, message:err.message});
         });
+    },
+
+    async teste(req,res) {
+        const { id } = req.params
+
+        await Cliente.findOne({
+            where: {id: id},
+            include: Orcamento
+        })
+        .then((data) => {
+            res.json({success:true, message:"Cliente encontrado", data:data});
+        })
+        .catch(err => {
+            res.json({success:false, message:err.message});
+        })
     },
 
     //Criar clientes
