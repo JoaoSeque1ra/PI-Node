@@ -14,7 +14,8 @@ const Contem = sequelize.define("contem", {
     valor: {
         type: Sequelize.DECIMAL(10,2),
         allowNull: false,
-    }
+    },
+    selfGranted: Sequelize.BOOLEAN
 }, 
 { 
     timestamps: false,
@@ -22,11 +23,11 @@ const Contem = sequelize.define("contem", {
 });
 
 DescricaoServico.belongsToMany(Orcamento, { 
-    through: Contem,
+    through: "contem",
     foreignKey: 'descricao_servico_id'
 });
 Orcamento.belongsToMany(DescricaoServico, { 
-    through: Contem,
+    through: "contem",
     foreignKey: 'orcamento_id'
 });
 
