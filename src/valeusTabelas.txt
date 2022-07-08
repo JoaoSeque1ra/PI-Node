@@ -220,7 +220,7 @@ insert into descricao_servicos (servico_id, descricao, preco) values
 /* Tabela: estados                                                                                            */
 /*============================================================================================================*/
 insert into estados (estado) values
-('Novo'),
+('novo'),
 ('Em tratamento'),
 ('Enviado'),
 ('Confirmado'),

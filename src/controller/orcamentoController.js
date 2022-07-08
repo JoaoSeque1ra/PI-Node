@@ -115,56 +115,6 @@ module.exports = {
 
     },
 
-    async createOrcamento2(req,res) {
-        const { clientNome , estado, valor, nomeDescricaoProduto } = req.body;
-
-        //Data
-        const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        console.log("Dia: " + date);
-    
-        //Cliente
-        const clientId = await Cliente.findOne({
-            where: { nome: clientNome }
-        })
-        console.log("Dados do Cliente: " + clientId.dataValues)
-    
-        //Estado do pedido
-        const estadoId = await EstadoPedido.findOne({
-            where: { estado: estado }
-        })
-        console.log("Estado do pedido: " + estadoId.dataValues)
-
-        //Orçamento
-        console.log("Vou criar o Orçamento");
-        const orcamento = await Orcamento.create({
-            estado_pedido_id: estadoId.id,
-            cliente_id: clientId.id,
-            valor: 0,
-            data_orcamento: date,
-            descricaoServicos: [{
-                descricao: "Bomb",
-                contem: {
-                    selfGranted: true
-                }
-            }]
-        })
-        .then((data) => {
-            res.json({success:true, message:"Criado com sucesso um novo Orçamento", data:data});
-            return data
-        })
-        .catch(err => {
-            console.log("Erro no createOrcamento: " + err);
-            res.json({success:false, message:err.message});
-        });
-
-        const result = await Orcamento.findAll({
-            include: DescricaoServico
-        })
-          
-        console.log(result.json);
-
-    },
-
     //------------Clientes------------------
     //Listar Clientes
     async listClients(req,res) {
