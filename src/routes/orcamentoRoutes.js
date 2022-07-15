@@ -29,4 +29,7 @@ router.get('/findMarketingDigital', orcamentoController.listMarketingDigital);
 
 router.get('/findWebsiteLojaOnline', orcamentoController.listWebsiteLojaOnline);
 
+router.post('/updateDescricaoServicos/:id', orcamentoController.updateDescricaoServicos);
+
+
 module.exports = router;

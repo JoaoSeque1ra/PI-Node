@@ -15,6 +15,7 @@ sequelize.sync({
 
 module.exports = {
     //------------Serviços------------------
+    //---------Listar--------------
     async listServicosComunicacaoConsultoria(req,res) {
         await DescricaoServico.findAll({
             include: [{
@@ -22,7 +23,8 @@ module.exports = {
                 where: {
                     tipo_servico_id: 4
                 }
-            }]
+            }],
+            order: ["id"]
         })
         .then((data)=> {
             res.json({success: true, message: "Lista de Descrição de serviços enviada", data: data})
@@ -40,7 +42,8 @@ module.exports = {
                 where: {
                     tipo_servico_id: 2
                 }
-            }]
+            }],
+            order: ["id"]
         })
         .then((data)=> {
             res.json({success: true, message: "Lista de Descrição de serviços enviada", data: data})
@@ -58,7 +61,8 @@ module.exports = {
                 where: {
                     tipo_servico_id: 1
                 }
-            }]
+            }],
+            order: ["id"]
         })
         .then((data)=> {
             res.json({success: true, message: "Lista de Descrição de serviços enviada", data: data})
@@ -76,10 +80,32 @@ module.exports = {
                 where: {
                     tipo_servico_id: 3
                 }
-            }]
+            }],
+            order: ["id"]
         })
         .then((data)=> {
             res.json({success: true, message: "Lista de Descrição de serviços enviada", data: data})
+        })
+        .catch(err => {
+            console.log("Erro no listServicosComunicacaoConsultoria " + err);
+            res.json({ success: false, message: err.message });
+        })
+    },
+
+    //---------Update--------------
+    async updateDescricaoServicos(req,res) {
+        const {id} = req.params
+
+        const {novoPreco} = req.body
+
+        await DescricaoServico.update({
+            preco: novoPreco
+        },{
+            where: {id: id},
+            returning: true
+        })
+        .then((data)=> {
+            res.json({success: true, message: "Lista de Descrição de serviços foi atualizada", data: data})
         })
         .catch(err => {
             console.log("Erro no listServicosComunicacaoConsultoria " + err);
