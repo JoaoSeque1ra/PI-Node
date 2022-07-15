@@ -21,4 +21,12 @@ router.post('/createClient', orcamentoController.createClient);
 
 router.post('/updateClient/:id', orcamentoController.updateClient);
 
+router.get('/findServicosComunicacaoConsultoria', orcamentoController.listServicosComunicacaoConsultoria);
+
+router.get('/findServicosDesignGrafico', orcamentoController.listServicosDesignGrafico);
+
+router.get('/findMarketingDigital', orcamentoController.listMarketingDigital);
+
+router.get('/findWebsiteLojaOnline', orcamentoController.listWebsiteLojaOnline);
+
 module.exports = router;

@@ -14,6 +14,79 @@ sequelize.sync({
 })
 
 module.exports = {
+    //------------Serviços------------------
+    async listServicosComunicacaoConsultoria(req,res) {
+        await DescricaoServico.findAll({
+            include: [{
+                model: Servico,
+                where: {
+                    tipo_servico_id: 4
+                }
+            }]
+        })
+        .then((data)=> {
+            res.json({success: true, message: "Lista de Descrição de serviços enviada", data: data})
+        })
+        .catch(err => {
+            console.log("Erro no listServicosComunicacaoConsultoria " + err);
+            res.json({ success: false, message: err.message });
+        })
+    },
+
+    async listServicosDesignGrafico(req,res) {
+        await DescricaoServico.findAll({
+            include: [{
+                model: Servico,
+                where: {
+                    tipo_servico_id: 2
+                }
+            }]
+        })
+        .then((data)=> {
+            res.json({success: true, message: "Lista de Descrição de serviços enviada", data: data})
+        })
+        .catch(err => {
+            console.log("Erro no listServicosComunicacaoConsultoria " + err);
+            res.json({ success: false, message: err.message });
+        })
+    },
+
+    async listMarketingDigital(req,res) {
+        await DescricaoServico.findAll({
+            include: [{
+                model: Servico,
+                where: {
+                    tipo_servico_id: 1
+                }
+            }]
+        })
+        .then((data)=> {
+            res.json({success: true, message: "Lista de Descrição de serviços enviada", data: data})
+        })
+        .catch(err => {
+            console.log("Erro no listServicosComunicacaoConsultoria " + err);
+            res.json({ success: false, message: err.message });
+        })
+    },
+
+    async listWebsiteLojaOnline(req,res) {
+        await DescricaoServico.findAll({
+            include: [{
+                model: Servico,
+                where: {
+                    tipo_servico_id: 3
+                }
+            }]
+        })
+        .then((data)=> {
+            res.json({success: true, message: "Lista de Descrição de serviços enviada", data: data})
+        })
+        .catch(err => {
+            console.log("Erro no listServicosComunicacaoConsultoria " + err);
+            res.json({ success: false, message: err.message });
+        })
+    },
+
     //------------Orçamento------------------
     //Listar Orçamentos
     async listOrcamentos(req, res) {
@@ -207,7 +280,7 @@ module.exports = {
     //------------Clientes------------------
     //Listar Clientes
     async listClients(req, res) {
-        await Cliente.findAll({})
+        await Cliente.findAll({include: Orcamento})
             .then(function (data) {
                 res.json({ success: true, message: "Lista de clientes enviada", data: data });
                 return data
