@@ -356,9 +356,6 @@ module.exports = {
     async createClient(req, res) {
         const { nome, telefone, email, empresa, morada, codigo_postal, localidade, numero_fiscal } = req.body;
 
-        const allClients = await Cliente.findAll({})
-        console.log(allClients)
-
         await Cliente.create({
             nome: nome,
             telefone: telefone,
