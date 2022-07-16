@@ -16,69 +16,14 @@ sequelize.sync({
 module.exports = {
     //------------Serviços------------------
     //---------Listar--------------
-    async listServicosComunicacaoConsultoria(req,res) {
-        await DescricaoServico.findAll({
-            include: [{
-                model: Servico,
-                where: {
-                    tipo_servico_id: 4
-                }
-            }],
-            order: ["id"]
-        })
-        .then((data)=> {
-            res.json({success: true, message: "Lista de Descrição de serviços enviada", data: data})
-        })
-        .catch(err => {
-            console.log("Erro no listServicosComunicacaoConsultoria " + err);
-            res.json({ success: false, message: err.message });
-        })
-    },
+    async listDescricaoServicos(req,res) {
+        const {id} = req.params
 
-    async listServicosDesignGrafico(req,res) {
         await DescricaoServico.findAll({
             include: [{
                 model: Servico,
                 where: {
-                    tipo_servico_id: 2
-                }
-            }],
-            order: ["id"]
-        })
-        .then((data)=> {
-            res.json({success: true, message: "Lista de Descrição de serviços enviada", data: data})
-        })
-        .catch(err => {
-            console.log("Erro no listServicosComunicacaoConsultoria " + err);
-            res.json({ success: false, message: err.message });
-        })
-    },
-
-    async listMarketingDigital(req,res) {
-        await DescricaoServico.findAll({
-            include: [{
-                model: Servico,
-                where: {
-                    tipo_servico_id: 1
-                }
-            }],
-            order: ["id"]
-        })
-        .then((data)=> {
-            res.json({success: true, message: "Lista de Descrição de serviços enviada", data: data})
-        })
-        .catch(err => {
-            console.log("Erro no listServicosComunicacaoConsultoria " + err);
-            res.json({ success: false, message: err.message });
-        })
-    },
-
-    async listWebsiteLojaOnline(req,res) {
-        await DescricaoServico.findAll({
-            include: [{
-                model: Servico,
-                where: {
-                    tipo_servico_id: 3
+                    tipo_servico_id: id
                 }
             }],
             order: ["id"]
