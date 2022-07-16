@@ -147,7 +147,7 @@ module.exports = {
                 where: { descricao: servicos[key] }
             })
                 .then((data) => {
-                    somar += data.preco
+                    somar += parseFloat(data.preco)
                     console.log(somar)
                     return data
                 })
@@ -225,7 +225,7 @@ module.exports = {
                 where: { descricao: servicos[key] }
             })
             .then((data) => {
-                somar += data.preco
+                somar += parseFloat(data.preco)
                 console.log(somar)
                 return data
             })
