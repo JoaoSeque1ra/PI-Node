@@ -62,7 +62,13 @@ module.exports = {
     //Listar Orçamentos
     async listOrcamentos(req, res) {
         await Orcamento.findAll({
-            include: DescricaoServico
+            include: [{
+                model: Contem,
+                
+                include: [{
+                  model: DescricaoServico,
+                }]
+            }, Cliente, EstadoPedido]
         })
             .then((data) => {
                 if (data != "")
@@ -82,14 +88,19 @@ module.exports = {
 
         await Orcamento.findOne({
             where: { id: id },
-            include: [Cliente, DescricaoServico]
+            include: [{
+                model: Contem,
+                
+                include: [{
+                  model: DescricaoServico,
+                }]
+            }, Cliente, EstadoPedido]
         })
             .then((data) => {
-                console.log(data.descricaoServicos.length)
-                if (data.descricaoServicos.length != 0)
-                    res.json({ success: true, message: "Orçamento encontrado", data: data });
-                else
-                    res.json({ success: false, message: "Orçamento não existe" });
+                if(data != null)
+                    return res.json({ success: true, message: "Orçamento encontrado", data: data });
+
+                res.json({ success: false, message: "Orçamento não existe" });
             })
             .catch(err => {
                 console.log("Erro no getOrcamento: " + err);
