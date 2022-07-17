@@ -181,13 +181,68 @@ module.exports = {
         })
     },
 
+    async updateOrcamentoValor(req,res) {
+        const { id } = req.params
+        console.log(id)
+
+        const {estado, descricaoServicosId, quantidade, valorServico} = req.body
+
+        const novoEstado = await EstadoPedido.findOne({
+            where: {estado: estado}
+        })
+
+        const servicoAntigo = await Contem.findAll({
+            where: {
+                orcamento_id: id,
+                descricao_servico_id: descricaoServicosId
+            }
+        })
+
+        await Contem.update({
+            quantidade: quantidade,
+            valor: valorServico
+        },{
+            where: {
+                orcamento_id: id,
+                descricao_servico_id: descricaoServicosId
+            },
+            returning: true
+        })
+
+        const servicoNovo = await Contem.findAll({
+            where: {
+                orcamento_id: id,
+                descricao_servico_id: descricaoServicosId
+            }
+        })
+
+        const OrcamentoAntigo = await Orcamento.findAll({
+            where: {id:id}
+        })
+
+        let valor = parseFloat(OrcamentoAntigo[0].dataValues.valor) - parseFloat(servicoAntigo[0].dataValues.valor)
+
+        let valorNovo = valor + parseFloat(servicoNovo[0].dataValues.valor) * parseInt(quantidade)
+
+        await Orcamento.update({
+            valor: parseFloat(valorNovo).toFixed(2),
+            estado_pedido_id: novoEstado.id
+        },{
+            where: {id: id},
+            returning: true
+        })
+        .then((data) => {
+            res.json({data: data})
+        })
+    },
+
     //Update Orçamento
     async updateOrcamento(req, res) {
         const { id } = req.params;
 
         console.log("Id do orçamento: " + id)
 
-        const { estado, nomeDescricaoProduto } = req.body
+        const { estado, nomeDescricaoProduto, quantidadeServico } = req.body
 
         //Encontrar Estado em relação ao estado(vem do frontend)
         //Pode levar update e mandar apenas o id(do frontend)
@@ -236,7 +291,7 @@ module.exports = {
             await Contem.create({
                 orcamento_id: id,
                 descricao_servico_id: descricao.id,
-                quantidade: 1,
+                quantidade: quantidadeServico,
                 valor: descricao.preco,
             })
 
