@@ -11,6 +11,8 @@ router.get('/findOrcamento/:id', orcamentoController.getOrcamento);
 
 router.post('/createOrcamento', orcamentoController.createOrcamento);
 
+router.post('/createOrcamentoById', orcamentoController.createOrcamentoNew);
+
 router.post('/updateOrcamento/:id', orcamentoController.updateOrcamento);
 
 router.post('/updateOrcamentoValor/:id', orcamentoController.updateOrcamentoValor);

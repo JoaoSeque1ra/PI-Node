@@ -15,24 +15,24 @@ sequelize.sync({
 
 module.exports = {
     //------------Estados------------------
-    async estadosServico(req,res) {
+    async estadosServico(req, res) {
         await EstadoPedido.findAll()
-        .then((data)=> {
-            if(data != null)
-                return res.json({success: true, message: "Lista de estados enviada", data: data})
-        
-            res.json({ success: false, message: "Não existe Estados disponíveis" });    
-        })
-        .catch(err => {
-            console.log("Erro no listServicosComunicacaoConsultoria " + err);
-            res.json({ success: false, message: err.message });
-        })
+            .then((data) => {
+                if (data != null)
+                    return res.json({ success: true, message: "Lista de estados enviada", data: data })
+
+                res.json({ success: false, message: "Não existe Estados disponíveis" });
+            })
+            .catch(err => {
+                console.log("Erro no listServicosComunicacaoConsultoria " + err);
+                res.json({ success: false, message: err.message });
+            })
     },
 
     //------------Serviços------------------
     //---------Listar--------------
-    async listDescricaoServicos(req,res) {
-        const {id} = req.params
+    async listDescricaoServicos(req, res) {
+        const { id } = req.params
 
         await DescricaoServico.findAll({
             include: [{
@@ -43,34 +43,34 @@ module.exports = {
             }],
             order: ["id"]
         })
-        .then((data)=> {
-            res.json({success: true, message: "Lista de Descrição de serviços enviada", data: data})
-        })
-        .catch(err => {
-            console.log("Erro no listServicosComunicacaoConsultoria " + err);
-            res.json({ success: false, message: err.message });
-        })
+            .then((data) => {
+                res.json({ success: true, message: "Lista de Descrição de serviços enviada", data: data })
+            })
+            .catch(err => {
+                console.log("Erro no listServicosComunicacaoConsultoria " + err);
+                res.json({ success: false, message: err.message });
+            })
     },
 
     //---------Update--------------
-    async updateDescricaoServicos(req,res) {
-        const {id} = req.params
+    async updateDescricaoServicos(req, res) {
+        const { id } = req.params
 
-        const {novoPreco} = req.body
+        const { novoPreco } = req.body
 
         await DescricaoServico.update({
             preco: novoPreco
-        },{
-            where: {id: id},
+        }, {
+            where: { id: id },
             returning: true
         })
-        .then((data)=> {
-            res.json({success: true, message: "Lista de Descrição de serviços foi atualizada", data: data})
-        })
-        .catch(err => {
-            console.log("Erro no listServicosComunicacaoConsultoria " + err);
-            res.json({ success: false, message: err.message });
-        })
+            .then((data) => {
+                res.json({ success: true, message: "Lista de Descrição de serviços foi atualizada", data: data })
+            })
+            .catch(err => {
+                console.log("Erro no listServicosComunicacaoConsultoria " + err);
+                res.json({ success: false, message: err.message });
+            })
     },
 
     //------------Orçamento------------------
@@ -79,9 +79,9 @@ module.exports = {
         await Orcamento.findAll({
             include: [{
                 model: Contem,
-                
+
                 include: [{
-                  model: DescricaoServico,
+                    model: DescricaoServico,
                 }]
             }, Cliente, EstadoPedido]
         })
@@ -105,14 +105,14 @@ module.exports = {
             where: { id: id },
             include: [{
                 model: Contem,
-                
+
                 include: [{
-                  model: DescricaoServico,
+                    model: DescricaoServico,
                 }]
             }, Cliente, EstadoPedido]
         })
             .then((data) => {
-                if(data != null)
+                if (data != null)
                     return res.json({ success: true, message: "Orçamento encontrado", data: data });
 
                 res.json({ success: false, message: "Orçamento não existe" });
@@ -121,6 +121,63 @@ module.exports = {
                 console.log("Erro no getOrcamento: " + err);
                 res.json({ success: false, message: err.message });
             });
+    },
+
+    async createOrcamentoNew(req, res) {
+        const { idCliente, idDescricao, quantidade } = req.body
+
+        // const cliente = await Cliente.findOne({
+        //     where: { id: idCliente }
+        // })
+
+        const orcamento = await Orcamento.create({
+            valor: 0
+        })
+
+        const servicos = idDescricao.split(",")
+        console.log(servicos.length)
+
+        const quantidadeServico = quantidade.split(",")
+        console.log(quantidade.length)
+
+        let valorFinal = 0
+
+        servicos.map(async (data, index) => {
+            const descricao = await DescricaoServico.findOne({
+                where: { id: data }
+            })
+                .then((data) => {
+                    valorFinal += parseFloat(data.preco)
+                    return data
+                })
+
+            const contem = await Contem.create({
+                orcamento_id: orcamento.id,
+                descricao_servico_id: descricao.id,
+                quantidade: quantidadeServico[index],
+                valor: descricao.preco,
+            })
+
+            //Na ultima passagem faz
+            if (servicos.length - 1 == index) {
+                orcamento.valor = valorFinal
+                orcamento.estado_pedido_id = 1
+                orcamento.cliente_id = idCliente
+
+                await orcamento.save()
+
+                await Orcamento.findOne({ where: { id: orcamento.id } })
+                    .then((data) => {
+                        res.json({ success: true, message: "Criado com sucesso um novo Orçamento", data: data });
+                        return data
+                    })
+                    .catch(err => {
+                        console.log("Erro no createOrcamento: " + err);
+                        res.json({ success: false, message: err.message });
+                    })
+            }
+
+        })
     },
 
     //Criar Orçamento
@@ -196,14 +253,14 @@ module.exports = {
         })
     },
 
-    async updateOrcamentoValor(req,res) {
+    async updateOrcamentoValor(req, res) {
         const { id } = req.params
         console.log(id)
 
-        const {estado, descricaoServicosId, quantidade, valorServico} = req.body
+        const { estado, descricaoServicosId, quantidade, valorServico } = req.body
 
         const novoEstado = await EstadoPedido.findOne({
-            where: {estado: estado}
+            where: { estado: estado }
         })
 
         const servicoAntigo = await Contem.findAll({
@@ -216,7 +273,7 @@ module.exports = {
         await Contem.update({
             quantidade: quantidade,
             valor: valorServico
-        },{
+        }, {
             where: {
                 orcamento_id: id,
                 descricao_servico_id: descricaoServicosId
@@ -232,7 +289,7 @@ module.exports = {
         })
 
         const OrcamentoAntigo = await Orcamento.findAll({
-            where: {id:id}
+            where: { id: id }
         })
 
         console.log(OrcamentoAntigo[0].dataValues.valor)
@@ -240,24 +297,24 @@ module.exports = {
         let valor = parseFloat(OrcamentoAntigo[0].dataValues.valor) - parseFloat(servicoAntigo[0].dataValues.valor) * parseInt(servicoAntigo[0].quantidade)
 
         let valorNovo = valor + parseFloat(servicoNovo[0].dataValues.valor) * parseInt(quantidade)
-        
+
         console.log(valor)
         console.log(valorNovo)
 
         await Orcamento.update({
             valor: parseFloat(valorNovo).toFixed(2),
             estado_pedido_id: novoEstado.id
-        },{
-            where: {id: id},
+        }, {
+            where: { id: id },
             returning: true
         })
-        .then((data) => {
-            res.json({success:true, message:"Atualizado valores do orçamento com sucesso", data:data});
-        })
-        .catch(err => {
-            console.log("Erro no updateOrcamentoValor: " + err);
-            res.json({success:false, message:err.message});
-        })
+            .then((data) => {
+                res.json({ success: true, message: "Atualizado valores do orçamento com sucesso", data: data });
+            })
+            .catch(err => {
+                console.log("Erro no updateOrcamentoValor: " + err);
+                res.json({ success: false, message: err.message });
+            })
     },
 
     //Update Orçamento
@@ -277,9 +334,9 @@ module.exports = {
 
         console.log("Vou editar o Orçamento");
         await Orcamento.update(
-        {
-            estado_pedido_id: estadoId.id
-        },{
+            {
+                estado_pedido_id: estadoId.id
+            }, {
             where: { id: id },
             returning: true
         })
@@ -303,14 +360,14 @@ module.exports = {
             const descricao = await DescricaoServico.findOne({
                 where: { descricao: servicos[key] }
             })
-            .then((data) => {
-                somar += parseFloat(data.preco)
-                console.log(somar)
-                return data
-            })
-            .catch(err => {
-                console.log(err.message)
-            })
+                .then((data) => {
+                    somar += parseFloat(data.preco)
+                    console.log(somar)
+                    return data
+                })
+                .catch(err => {
+                    console.log(err.message)
+                })
 
             await Contem.create({
                 orcamento_id: id,
@@ -320,20 +377,20 @@ module.exports = {
             })
 
             //Na ultima passagem faz
-            if(servicos.length - 1 == key) {
-                const orcamento = await Orcamento.findOne({where: {id: id}})
+            if (servicos.length - 1 == key) {
+                const orcamento = await Orcamento.findOne({ where: { id: id } })
 
                 orcamento.valor = somar
                 await orcamento.save()
 
-                await Orcamento.findOne({where: {id: id}})
-                .then((data) => {
-                    res.json({success:true, message:"Criado com sucesso um novo Orçamento", data:data});
-                })
-                .catch(err => {
-                    console.log("Erro no createOrcamento: " + err);
-                    res.json({success:false, message:err.message});
-                })
+                await Orcamento.findOne({ where: { id: id } })
+                    .then((data) => {
+                        res.json({ success: true, message: "Criado com sucesso um novo Orçamento", data: data });
+                    })
+                    .catch(err => {
+                        console.log("Erro no createOrcamento: " + err);
+                        res.json({ success: false, message: err.message });
+                    })
             }
         })
     },
@@ -341,7 +398,7 @@ module.exports = {
     //------------Clientes------------------
     //Listar Clientes
     async listClients(req, res) {
-        await Cliente.findAll({include: Orcamento})
+        await Cliente.findAll({ include: Orcamento })
             .then(function (data) {
                 res.json({ success: true, message: "Lista de clientes enviada", data: data });
                 return data
