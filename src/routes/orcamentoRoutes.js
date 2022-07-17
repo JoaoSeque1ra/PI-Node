@@ -3,6 +3,8 @@ const router = express.Router();
 
 const orcamentoController = require('../controller/orcamentoController');
 
+router.get('/listEstados', orcamentoController.estadosServico);
+
 router.get('/listOrcamento', orcamentoController.listOrcamentos);
 
 router.get('/findOrcamento/:id', orcamentoController.getOrcamento);

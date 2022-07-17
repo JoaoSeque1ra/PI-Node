@@ -14,6 +14,21 @@ sequelize.sync({
 })
 
 module.exports = {
+    //------------Estados------------------
+    async estadosServico(req,res) {
+        await EstadoPedido.findAll()
+        .then((data)=> {
+            if(data != null)
+                return res.json({success: true, message: "Lista de estados enviada", data: data})
+        
+            res.json({ success: false, message: "Não existe Estados disponíveis" });    
+        })
+        .catch(err => {
+            console.log("Erro no listServicosComunicacaoConsultoria " + err);
+            res.json({ success: false, message: err.message });
+        })
+    },
+
     //------------Serviços------------------
     //---------Listar--------------
     async listDescricaoServicos(req,res) {
@@ -220,9 +235,14 @@ module.exports = {
             where: {id:id}
         })
 
-        let valor = parseFloat(OrcamentoAntigo[0].dataValues.valor) - parseFloat(servicoAntigo[0].dataValues.valor)
+        console.log(OrcamentoAntigo[0].dataValues.valor)
+        console.log(descricaoServicosId)
+        let valor = parseFloat(OrcamentoAntigo[0].dataValues.valor) - parseFloat(servicoAntigo[0].dataValues.valor) * parseInt(servicoAntigo[0].quantidade)
 
         let valorNovo = valor + parseFloat(servicoNovo[0].dataValues.valor) * parseInt(quantidade)
+        
+        console.log(valor)
+        console.log(valorNovo)
 
         await Orcamento.update({
             valor: parseFloat(valorNovo).toFixed(2),
@@ -232,7 +252,11 @@ module.exports = {
             returning: true
         })
         .then((data) => {
-            res.json({data: data})
+            res.json({success:true, message:"Atualizado valores do orçamento com sucesso", data:data});
+        })
+        .catch(err => {
+            console.log("Erro no updateOrcamentoValor: " + err);
+            res.json({success:false, message:err.message});
         })
     },
 
