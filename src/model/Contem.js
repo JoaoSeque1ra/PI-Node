@@ -21,14 +21,30 @@ const Contem = sequelize.define("contem", {
     tableName: "contem"
 });
 
-DescricaoServico.belongsToMany(Orcamento, { 
-    through: Contem,
+DescricaoServico.hasMany(Contem, {
     foreignKey: 'descricao_servico_id'
-});
+})
 
-Orcamento.belongsToMany(DescricaoServico, { 
-    through: Contem,
+Contem.belongsTo(DescricaoServico, {
+    foreignKey: 'descricao_servico_id'
+})
+
+Orcamento.hasMany(Contem, {
     foreignKey: 'orcamento_id'
-});
+})
+
+Contem.belongsTo(Orcamento, {
+    foreignKey: 'orcamento_id'
+})
+
+// DescricaoServico.belongsToMany(Orcamento, { 
+//     through: Contem,
+//     foreignKey: 'descricao_servico_id'
+// });
+
+// Orcamento.belongsToMany(DescricaoServico, { 
+//     through: Contem,
+//     foreignKey: 'orcamento_id'
+// });
 
 module.exports = Contem;

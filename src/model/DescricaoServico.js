@@ -11,7 +11,7 @@ const DescricaoServico = sequelize.define("descricaoServico", {
         allowNull: false,
     },
     preco: {
-        type: Sequelize.DOUBLE,
+        type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
     }
 },
