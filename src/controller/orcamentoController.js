@@ -10,7 +10,7 @@ const Servico = require("../model/Servico");
 const TipoServico = require("../model/TipoServico");
 
 sequelize.sync({
-    //force:true
+    // force:true
 })
 
 module.exports = {
@@ -448,23 +448,38 @@ module.exports = {
     async createClient(req, res) {
         const { nome, telefone, email, empresa, morada, codigo_postal, localidade, numero_fiscal } = req.body;
 
-        await Cliente.create({
-            nome: nome,
-            telefone: telefone,
+        await Cliente.findOne({where: {
             email: email,
-            empresa: empresa,
-            morada: morada,
-            codigo_postal: codigo_postal,
-            localidade: localidade,
-            numero_fiscal: numero_fiscal
+            nome: nome,
+            telefone: telefone
+        }})
+        .then(async (data) => {
+            if(data === null) {
+                return await Cliente.create({
+                    nome: nome,
+                    telefone: telefone,
+                    email: email,
+                    empresa: empresa,
+                    morada: morada,
+                    codigo_postal: codigo_postal,
+                    localidade: localidade,
+                    numero_fiscal: numero_fiscal
+                })
+                    .then((data) => {
+                        res.json({ success: true, message: "Criado com sucesso um novo cliente", data: data });
+                    })
+                    .catch(err => {
+                        console.log("Erro no createClient: " + err);
+                        res.json({ success: false, message: err.message });
+                    });
+            }
+
+            res.json({ success: true, message: "Cliente ja existe", data: data });
         })
-            .then((data) => {
-                res.json({ success: true, message: "Criado com sucesso um novo cliente", data: data });
-            })
-            .catch(err => {
-                console.log("Erro no createClient: " + err);
-                res.json({ success: false, message: err.message });
-            });
+        
+
+
+        
     },
 
     //Update clientes
