@@ -83,7 +83,8 @@ module.exports = {
                 include: [{
                     model: DescricaoServico,
                 }]
-            }, Cliente, EstadoPedido]
+            }, Cliente, EstadoPedido],
+            order: ["id"]
         })
             .then((data) => {
                 if (data != "")
